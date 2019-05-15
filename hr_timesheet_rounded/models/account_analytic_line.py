@@ -105,8 +105,9 @@ class AccountAnalyticLine(models.Model):
         This affects `account_anaytic_line._sale_determine_order_line`.
         """
         ctx_ts_rounded = self.env.context.get('timesheet_rounding')
-        fields_local = fields[:] if fields else []
-        if ctx_ts_rounded and 'unit_amount' in fields_local:
+        fields_local = fields.copy() if fields else []
+        read_unit_amount = 'unit_amount' in fields_local or not fields_local
+        if ctx_ts_rounded and read_unit_amount and fields_local:
             if 'unit_amount_rounded' not in fields_local:
                 # To add the unit_amount_rounded value on read
                 fields_local.append('unit_amount_rounded')
@@ -115,7 +116,7 @@ class AccountAnalyticLine(models.Model):
             if 'product_id' not in fields_local:
                 fields_local.append('product_id')
         res = super().read(fields_local, load=load)
-        if ctx_ts_rounded:
+        if ctx_ts_rounded and read_unit_amount:
             # To set the unit_amount_rounded value insted of unit_amount
             for rec in res:
                 product_model = self.env['product.product']
@@ -133,6 +134,6 @@ class AccountAnalyticLine(models.Model):
                 # Check if the product is a not a expenses
                 # and corresponding to one project and unit_amount_rounded is
                 # present
-                if rec['project_id'] and not is_expense and rounded:
+                if rec.get('project_id') and not is_expense and rounded:
                     rec['unit_amount'] = rec['unit_amount_rounded']
         return res
