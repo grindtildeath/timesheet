@@ -9,7 +9,7 @@ class ProjectProject(models.Model):
 
     timesheet_rounding_granularity = fields.Float(
         string='Timesheet rounding granularity',
-        default=0.25,  # 15 min
+        default=0.0,
         help="""1.0 = hour
             0.25 = 15 min
             0.084 ~= 5 min

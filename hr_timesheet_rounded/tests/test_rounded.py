@@ -7,6 +7,9 @@ from odoo.addons.sale_timesheet.tests.common \
 
 class TestRounded(TestCommonSaleTimesheetNoChart):
 
+    at_install = False
+    post_install = True
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

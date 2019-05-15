@@ -3,8 +3,9 @@ Go to a project and set the following fields according to your needs:
 
 * Timesheet rounding granularity
 
-Defines the rounding unit, defaults to `0.25` (15 min).
+Defines the rounding unit.
 For instance, if you want to round to 1 hour, you can set `1.0`.
+If you want to round to 15 min set `0.25`.
 
 
 * Timesheet rounding method
