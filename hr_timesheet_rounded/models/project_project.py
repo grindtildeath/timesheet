@@ -19,8 +19,9 @@ class ProjectProject(models.Model):
     timesheet_rounding_method = fields.Selection(
         string='Timesheet rounding method',
         selection=[
-            ('HALF_UP', 'Closest'),
             ('UP', 'Up'),
+            ('HALF_UP', 'Closest'),
+            ('DOWN', 'Down'),
         ],
         default='UP',
         required=True
