@@ -75,7 +75,7 @@ class AccountAnalyticLine(models.Model):
     ####################################################
     @api.model
     def read_group(self, domain, fields, groupby, offset=0,
-                   limit=None, orderby=False, lazy=False):
+                   limit=None, orderby=False, lazy=True):
         """Replace the value of unit_amount by unit_amount_rounded.
 
         When context key `timesheet_rounding` is True
