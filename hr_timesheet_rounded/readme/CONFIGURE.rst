@@ -10,7 +10,7 @@ If you want to round to 15 min set `0.25`.
 
 * Timesheet rounding method
 
-Options: "Closest", "Up" (default).
+Options: "Closest", "Up" (default), "Down".
 
 Please refer to `odoo.tools.float_utils.float_round` to understand the difference.
 
@@ -19,6 +19,7 @@ Please refer to `odoo.tools.float_utils.float_round` to understand the differenc
 
 When round unit is not defined you can round by a fixed %.
 
-When using both a factor and a percentage, the percentage will be applied first:
+
+When using both a unit and a factor, the factor will be applied first:
 
   result = round(amount * percentage, unit)
