@@ -39,19 +39,19 @@ class AccountAnalyticLine(models.Model):
                 # already set, no forcing: do nothing
                 continue
             rec.unit_amount_rounded = self._calc_rounded_amount(
-                rec.project_id.timesheet_rounding_granularity,
+                rec.project_id.timesheet_rounding_unit,
                 rec.project_id.timesheet_rounding_method,
-                rec.project_id.timesheet_invoicing_factor,
+                rec.project_id.timesheet_rounding_factor,
                 rec.unit_amount,
             )
 
     @staticmethod
-    def _calc_rounded_amount(granularity, rounding_method, factor, amount):
+    def _calc_rounded_amount(rounding_unit, rounding_method, factor, amount):
         factor = factor / 100.0
-        if granularity:
+        if rounding_unit:
             unit_amount_rounded = float_round(
                 amount * factor,
-                precision_rounding=granularity,
+                precision_rounding=rounding_unit,
                 rounding_method=rounding_method
             )
         else:

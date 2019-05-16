@@ -34,9 +34,9 @@ class TestRounded(TestCommonSaleTimesheetNoChart):
         sale_order_line.product_id_change()
         cls.sale_order.action_confirm()
         cls.project_global.write({
-            'timesheet_rounding_granularity': 0.25,
+            'timesheet_rounding_unit': 0.25,
             'timesheet_rounding_method': 'UP',
-            'timesheet_invoicing_factor': 200,
+            'timesheet_rounding_factor': 200,
         })
         cls.product_expense = cls.env['product.product'].create({
             'name': "Service delivered, EXPENSE",
@@ -68,8 +68,8 @@ class TestRounded(TestCommonSaleTimesheetNoChart):
 
     def test_analytic_line_create_no_rounding(self):
         self.project_global.write({
-            'timesheet_rounding_granularity': False,
-            'timesheet_invoicing_factor': False,
+            'timesheet_rounding_unit': False,
+            'timesheet_rounding_factor': False,
         })
         # no rounding enabled
         line = self.create_analytic_line(unit_amount=1)
@@ -181,9 +181,9 @@ class TestRounded(TestCommonSaleTimesheetNoChart):
     def test_sale_order_qty_3(self):
         # amount=0.9
         # should be rounded to 2 by the invoicing_factor with the project
-        # timesheet_rounding_granularity: 0.25
+        # timesheet_rounding_unit: 0.25
         # timesheet_rounding_method: 'UP'
-        # timesheet_invoicing_factor: 200
+        # timesheet_rounding_factor: 200
         self.create_analytic_line(unit_amount=0.9)
         self.assertAlmostEqual(self.sale_order.order_line.qty_delivered, 2.0)
         self.assertAlmostEqual(self.sale_order.order_line.qty_to_invoice, 2.0)
@@ -192,10 +192,10 @@ class TestRounded(TestCommonSaleTimesheetNoChart):
     def test_sale_order_qty_4(self):
         # amount=0.9
         # should be rounded to 2 by the invoicing_factor with the project
-        # timesheet_rounding_granularity: 0.25
+        # timesheet_rounding_unit: 0.25
         # timesheet_rounding_method: 'UP'
-        # timesheet_invoicing_factor: 200
-        self.project_global.timesheet_invoicing_factor = 400
+        # timesheet_rounding_factor: 200
+        self.project_global.timesheet_rounding_factor = 400
         self.create_analytic_line(unit_amount=1.0)
         self.assertAlmostEqual(self.sale_order.order_line.qty_delivered, 4.0)
         self.assertAlmostEqual(self.sale_order.order_line.qty_to_invoice, 4.0)
@@ -203,61 +203,61 @@ class TestRounded(TestCommonSaleTimesheetNoChart):
 
     def test_calc_rounded_amount_method(self):
         aal = self.env['account.analytic.line']
-        granularity = 0.25
+        rounding_unit = 0.25
         rounding_method = 'UP'
         factor = 200
         amount = 1
         self.assertEqual(
             aal._calc_rounded_amount(
-                granularity, rounding_method, factor, amount
+                rounding_unit, rounding_method, factor, amount
             ), 2)
 
-        granularity = 0.0
+        rounding_unit = 0.0
         rounding_method = 'UP'
         factor = 200
         amount = 1
         self.assertEqual(
             aal._calc_rounded_amount(
-                granularity, rounding_method, factor, amount
+                rounding_unit, rounding_method, factor, amount
             ), 2
         )
 
-        granularity = 0.25
+        rounding_unit = 0.25
         rounding_method = 'UP'
         factor = 100
         amount = 1.0
         self.assertEqual(
             aal._calc_rounded_amount(
-                granularity, rounding_method, factor, amount
+                rounding_unit, rounding_method, factor, amount
             ), 1
         )
 
-        granularity = 0.25
+        rounding_unit = 0.25
         rounding_method = 'UP'
         factor = 200
         amount = 0.9
         self.assertEqual(
             aal._calc_rounded_amount(
-                granularity, rounding_method, factor, amount
+                rounding_unit, rounding_method, factor, amount
             ), 2
         )
 
-        granularity = 1.0
+        rounding_unit = 1.0
         rounding_method = 'UP'
         factor = 200
         amount = 0.6
         self.assertEqual(
             aal._calc_rounded_amount(
-                granularity, rounding_method, factor, amount
+                rounding_unit, rounding_method, factor, amount
             ), 2
         )
 
-        granularity = 0.25
+        rounding_unit = 0.25
         rounding_method = 'HALF_UP'
         factor = 200
         amount = 1.01
         self.assertEqual(
             aal._calc_rounded_amount(
-                granularity, rounding_method, factor, amount
+                rounding_unit, rounding_method, factor, amount
             ), 2
         )
