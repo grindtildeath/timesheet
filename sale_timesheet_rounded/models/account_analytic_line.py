@@ -83,7 +83,6 @@ class AccountAnalyticLine(models.Model):
         This affects `sale_order_line._compute_delivered_quantity`
         which in turns compute the delivered qty on SO line.
         """
-        import pdb; pdb.set_trace()
         ctx_ts_rounded = self.env.context.get('timesheet_rounding')
         fields_local = fields.copy() if fields else []
         if ctx_ts_rounded:
