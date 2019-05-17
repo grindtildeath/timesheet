@@ -11,7 +11,7 @@
                     <group string="Time rounding" name="time_rounding_parameters">
                         <field name="timesheet_rounding_granularity"/>
                         <field name="timesheet_rounding_method"/>
-                        <field name="timesheet_invoicing_factor"/>
+                        <field name="timesheet_rounding_factor"/>
                     </group>
                 </group>
             </xpath>
