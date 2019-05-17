@@ -39,19 +39,19 @@ class AccountAnalyticLine(models.Model):
                 # already set, no forcing: do nothing
                 continue
             rec.unit_amount_rounded = self._calc_rounded_amount(
-                rec.project_id.timesheet_rounding_granularity,
+                rec.project_id.timesheet_rounding_unit,
                 rec.project_id.timesheet_rounding_method,
-                rec.project_id.timesheet_invoicing_factor,
+                rec.project_id.timesheet_rounding_factor,
                 rec.unit_amount,
             )
 
     @staticmethod
-    def _calc_rounded_amount(granularity, rounding_method, factor, amount):
+    def _calc_rounded_amount(rounding_unit, rounding_method, factor, amount):
         factor = factor / 100.0
-        if granularity:
+        if rounding_unit:
             unit_amount_rounded = float_round(
                 amount * factor,
-                precision_rounding=granularity,
+                precision_rounding=rounding_unit,
                 rounding_method=rounding_method
             )
         else:
@@ -74,7 +74,7 @@ class AccountAnalyticLine(models.Model):
     # ORM Overrides
     ####################################################
     @api.model
-    def read_group(self, domain, fields, groupby, offset=0,
+    def read_group(self, domain, fields_list, groupby, offset=0,
                    limit=None, orderby=False, lazy=True):
         """Replace the value of unit_amount by unit_amount_rounded.
 
@@ -84,11 +84,12 @@ class AccountAnalyticLine(models.Model):
         which in turns compute the delivered qty on SO line.
         """
         ctx_ts_rounded = self.env.context.get('timesheet_rounding')
+        fields_local = fields_list.copy() if fields_list else []
         if ctx_ts_rounded:
             # To add the unit_amount_rounded value on read_group
-            fields.append('unit_amount_rounded')
+            fields_local.append('unit_amount_rounded')
         res = super().read_group(
-            domain, fields, groupby, offset=offset,
+            domain, fields_local, groupby, offset=offset,
             limit=limit, orderby=orderby, lazy=lazy
         )
         if ctx_ts_rounded:
@@ -97,7 +98,7 @@ class AccountAnalyticLine(models.Model):
                 rec['unit_amount'] = rec['unit_amount_rounded']
         return res
 
-    def read(self, fields=None, load='_classic_read'):
+    def read(self, fields_list=None, load='_classic_read'):
         """Replace the value of unit_amount by unit_amount_rounded.
 
         When context key `timesheet_rounding` is True
@@ -105,7 +106,7 @@ class AccountAnalyticLine(models.Model):
         This affects `account_anaytic_line._sale_determine_order_line`.
         """
         ctx_ts_rounded = self.env.context.get('timesheet_rounding')
-        fields_local = fields.copy() if fields else []
+        fields_local = fields_list.copy() if fields_list else []
         read_unit_amount = 'unit_amount' in fields_local or not fields_local
         if ctx_ts_rounded and read_unit_amount and fields_local:
             if 'unit_amount_rounded' not in fields_local:
