@@ -65,10 +65,18 @@ class AccountAnalyticLine(models.Model):
         # and the consequent call to write,
         # event though it might be still useful for the onchange.
         # NOTE: we don't have to replace `amount` value.
-        if not self.env.context.get('update_unit_amount_rounded'):
-            if not values.get('unit_amount_rounded'):
+        if (
+            not self.env.context.get('update_unit_amount_rounded')
+            and not self.env.context.get('_no_rounding')
+        ):
+            if values.get('unit_amount_rounded') is None:
                 self._update_unit_amount_rounded()
-        return super()._timesheet_postprocess(values)
+        # Add no rounding key to avoid triggering
+        # _update_unit_amount_rounded on the write from
+        # _timesheet_postprocess to update the amount
+        return super(
+            AccountAnalyticLine, self.with_context(_no_rounding=True)
+        )._timesheet_postprocess(values)
 
     ####################################################
     # ORM Overrides

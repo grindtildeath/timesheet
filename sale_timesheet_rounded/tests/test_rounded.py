@@ -59,7 +59,6 @@ class TestRounded(TestCommonSaleTimesheetNoChart):
             'name': 'Rounded test line',
             'date': fields.Date.today(),
             'unit_amount': 0,
-            'unit_amount_rounded': 0,
             'product_id': self.product_delivery_timesheet2.id,
             'employee_id': self.employee_user.id,
         }
@@ -74,16 +73,24 @@ class TestRounded(TestCommonSaleTimesheetNoChart):
         # no rounding enabled
         line = self.create_analytic_line(unit_amount=1)
         self.assertEqual(line.unit_amount_rounded, 0.0)
+        line = self.create_analytic_line(unit_amount=1, unit_amount_rounded=2)
+        self.assertEqual(line.unit_amount_rounded, 2.0)
 
     def test_analytic_line_create(self):
         line = self.create_analytic_line(unit_amount=1)
         self.assertEqual(line.unit_amount_rounded, 2.0)
+        line._onchange_unit_amount()
+        self.assertEqual(line.unit_amount_rounded, 2.0)
+        line = self.create_analytic_line(unit_amount=1, unit_amount_rounded=0)
+        self.assertEqual(line.unit_amount_rounded, 0.0)
 
     def test_analytic_line_create_and_update_amount_rounded(self):
         line = self.create_analytic_line(unit_amount=2)
         self.assertEqual(line.unit_amount_rounded, 4.0)
-        line.unit_amount_rounded = 5.0
+        line.write({'unit_amount_rounded': 5.0})
         self.assertEqual(line.unit_amount_rounded, 5.0)
+        line.write({'unit_amount_rounded': 0.0})
+        self.assertEqual(line.unit_amount_rounded, 0.0)
 
     def test_analytic_line_create_and_update_amount(self):
         line = self.create_analytic_line(unit_amount=2)
