@@ -65,6 +65,11 @@ class TestRounded(TestCommonSaleTimesheetNoChart):
         values.update(kw)
         return self.env['account.analytic.line'].create(values)
 
+    def test_analytic_line_init_no_rounding(self):
+        lines = self.env['account.analytic.line'].search([])
+        for line in lines:
+            self.assertEqual(line.unit_amount_rounded, line.unit_amount)
+
     def test_analytic_line_create_no_rounding(self):
         self.project_global.write({
             'timesheet_rounding_method': 'NO',

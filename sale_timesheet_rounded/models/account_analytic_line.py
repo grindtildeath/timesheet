@@ -1,7 +1,11 @@
 # Copyright 2019 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
+import logging
+
 from odoo import api, fields, models
 from odoo.tools.float_utils import float_round
+
+_logger = logging.getLogger(__name__)
 
 
 class AccountAnalyticLine(models.Model):
@@ -12,6 +16,21 @@ class AccountAnalyticLine(models.Model):
         string="Quantity rounded",
         default=0.0,
     )
+
+    @api.model_cr_context
+    def _init_column(self, column_name):
+        """ Initialize the value of the given column for existing rows.
+            Overridden here because we need to have different default values
+            for unit_amount_rounded for every analytic line.
+        """
+        if column_name != 'unit_amount_rounded':
+            super()._init_column(column_name)
+        else:
+            _logger.info('Initializing column `unit_amount_rounded` with the '
+                         'value of `unit_amount`')
+            query = 'UPDATE "%s" SET unit_amount_rounded = unit_amount;' % \
+                    self._table
+            self.env.cr.execute(query)
 
     @api.onchange('unit_amount')
     def _onchange_unit_amount(self):
