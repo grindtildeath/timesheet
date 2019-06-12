@@ -67,14 +67,12 @@ class TestRounded(TestCommonSaleTimesheetNoChart):
 
     def test_analytic_line_create_no_rounding(self):
         self.project_global.write({
-            'timesheet_rounding_unit': False,
-            'timesheet_rounding_factor': False,
+            'timesheet_rounding_method': 'NO',
         })
         # no rounding enabled
         line = self.create_analytic_line(unit_amount=1)
-        self.assertEqual(line.unit_amount_rounded, 0.0)
-        line = self.create_analytic_line(unit_amount=1, unit_amount_rounded=2)
-        self.assertEqual(line.unit_amount_rounded, 2.0)
+        self.assertEqual(line.unit_amount, 1.0)
+        self.assertEqual(line.unit_amount_rounded, line.unit_amount)
 
     def test_analytic_line_create(self):
         line = self.create_analytic_line(unit_amount=1)

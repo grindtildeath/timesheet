@@ -38,12 +38,16 @@ class AccountAnalyticLine(models.Model):
             if rec.unit_amount_rounded and not force_compute:
                 # already set, no forcing: do nothing
                 continue
-            rec.unit_amount_rounded = self._calc_rounded_amount(
-                rec.project_id.timesheet_rounding_unit,
-                rec.project_id.timesheet_rounding_method,
-                rec.project_id.timesheet_rounding_factor,
-                rec.unit_amount,
-            )
+            if rec.project_id.timesheet_rounding_method == 'NO':
+                # No rounding to apply: copy the value
+                rec.unit_amount_rounded = rec.unit_amount
+            else:
+                rec.unit_amount_rounded = self._calc_rounded_amount(
+                    rec.project_id.timesheet_rounding_unit,
+                    rec.project_id.timesheet_rounding_method,
+                    rec.project_id.timesheet_rounding_factor,
+                    rec.unit_amount,
+                )
 
     @staticmethod
     def _calc_rounded_amount(rounding_unit, rounding_method, factor, amount):
